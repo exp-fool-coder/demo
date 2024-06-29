@@ -24,12 +24,11 @@ public class Profile {
     @Temporal(TemporalType.TIMESTAMP)
     private Instant updatedAt = Instant.now();
 
-    public Profile() {}
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    public Profile(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+    public Profile() {}
 
     public int getId() {
         return id;
@@ -53,6 +52,14 @@ public class Profile {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public ProfileResponse toProfileResponse() {
