@@ -1,20 +1,25 @@
-package com.example.demo.service;
+package com.example.demo.manager;
 
 import com.example.demo.entity.Profile;
+import com.example.demo.entity.User;
 import com.example.demo.repository.ProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Instant;
 import java.util.Optional;
 
-public class ProfileService {
+public class ProfileManager {
 
-    @Autowired
     ProfileRepository profileRepository;
 
-    public Profile create(String name) {
+    public ProfileManager(ProfileRepository profileRepository) {
+        this.profileRepository = profileRepository;
+    }
+
+    public Profile create(String name, User user) {
         Profile profile = new Profile();
         profile.setName(name);
+        profile.setUser(user);
         return profileRepository.save(profile);
     }
 
