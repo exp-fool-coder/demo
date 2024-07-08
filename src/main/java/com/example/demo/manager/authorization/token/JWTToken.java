@@ -10,6 +10,4 @@ public interface JWTToken {
     Claims getClaims(String token);
 
     boolean isValid(String token);
-
-
 }

@@ -31,7 +31,6 @@ public class LoginController {
         );
     }
 
-
     @PostMapping("/refresh")
     public JWTResponse refresh(@RequestBody JWTRefreshRequest request) {
         String refreshToken = request.getRefreshToken();

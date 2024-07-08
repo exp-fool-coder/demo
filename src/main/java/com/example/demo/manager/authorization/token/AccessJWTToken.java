@@ -2,11 +2,8 @@ package com.example.demo.manager.authorization.token;
 
 import com.example.demo.entity.User;
 import com.example.demo.model.ClaimField;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -15,14 +12,16 @@ import java.util.Map;
 
 public class AccessJWTToken implements JWTToken{
 
-    @Value("${jwt.signing.key}")
-    private String signingKey;
+    private final String signingKey;
 
-    @Value("${jwt.key.expiration}")
-    private Long jwtExpiration;
+    private final Long jwtExpiration;
 
     private SecretKey key;
 
+    public AccessJWTToken(String signingKey, Long jwtExpiration) {
+        this.signingKey = signingKey;
+        this.jwtExpiration = jwtExpiration;
+    }
 
     private SecretKey secretKey() {
         if (key == null) {
@@ -58,7 +57,26 @@ public class AccessJWTToken implements JWTToken{
 
     @Override
     public boolean isValid(String token) {
-        Claims claims = getClaims(token);
-        return claims.getExpiration().after(new Date());
+        try {
+            Jwts.parser()
+                    .verifyWith(secretKey())
+                    .build()
+                    .parseSignedClaims(token);
+            return true;
+//        } catch (ExpiredJwtException expEx) {
+//            log.error("Token expired", expEx);
+//        } catch (UnsupportedJwtException unsEx) {
+//            log.error("Unsupported jwt", unsEx);
+//        } catch (MalformedJwtException mjEx) {
+//            log.error("Malformed jwt", mjEx);
+//        } catch (SignatureException sEx) {
+//            log.error("Invalid signature", sEx);
+//        } catch (Exception e) {
+//            log.error("invalid token", e);
+//        }
+        } catch (JwtException e) {
+            return false;
+            //TODO:  make some more complexity
+        }
     }
 }

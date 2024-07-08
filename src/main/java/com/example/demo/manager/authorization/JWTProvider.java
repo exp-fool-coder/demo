@@ -1,5 +1,6 @@
 package com.example.demo.manager.authorization;
 
+import com.example.demo.configuration.properties.AppProperties;
 import com.example.demo.entity.User;
 import com.example.demo.manager.authorization.token.AccessJWTToken;
 import com.example.demo.manager.authorization.token.JWTToken;
@@ -8,9 +9,11 @@ import com.example.demo.model.ClaimField;
 import com.example.demo.model.Jwt;
 import com.example.demo.repository.UserRepository;
 import io.jsonwebtoken.Claims;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+@Component
 public class JWTProvider {
 
     private final JWTToken accessJWTToken;
@@ -18,9 +21,18 @@ public class JWTProvider {
 
     private final UserRepository userRepository;
 
-    public JWTProvider(UserRepository userRepository) {
-        accessJWTToken = new AccessJWTToken();
-        refreshJWTToken = new RefreshJWTToken();
+    public JWTProvider(
+            UserRepository userRepository,
+            AppProperties appProperties
+    ) {
+        accessJWTToken = new AccessJWTToken(
+                appProperties.jwtAccessTokenSigningKey,
+                appProperties.jwtAccessTokenExpiration
+        );
+        refreshJWTToken = new RefreshJWTToken(
+                appProperties.jwtRefreshTokenSigningKey,
+                appProperties.jwtRefreshTokenExpiration
+        );
         this.userRepository = userRepository;
     }
 
@@ -58,5 +70,9 @@ public class JWTProvider {
         Optional<User> user = userRepository.findById(userId);
 
         return user.isPresent();
+    }
+
+    public Claims getAccessClaims(String token) {
+        return accessJWTToken.getClaims(token);
     }
 }
